@@ -1,0 +1,332 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PixelForge Nexus - Login</title>
+    <link href="style.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"></link>
+</head>
+<body>
+    <div class="container">
+        <div class="login-background">
+            <div class="login-overlay"></div>
+            <div class="login-content">
+                <div class="login-form">
+                    <div class="logo-section">
+                        <div class="logo-icon">
+                            <i class="fas fa-project-diagram"></i>
+                        </div>
+                        <h1>PixelForge Nexus</h1>
+                        <p class="tagline">Streamline Your Project Management</p>
+                    </div>
+                    <h2>Sign In</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit">Sign In</button>
+            </form>
+            <div id="error-message" class="error"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard (hidden initially) -->
+    <div id="dashboard" class="dashboard hidden">
+        <nav class="navbar">
+            <h1>PixelForge Nexus</h1>
+            <div class="nav-right">
+                <span id="welcomeUser"></span>
+                <button id="accountSettings">Account Settings</button>
+                <button id="logoutBtn">Logout</button>
+            </div>
+        </nav>
+
+        <div class="dashboard-content">
+            <!-- Admin Dashboard -->
+            <div id="adminDashboard" class="role-dashboard hidden">
+                <h2><i class="fas fa-tachometer-alt"></i> Admin Dashboard</h2>
+                
+                <!-- Statistics Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card interactive" onclick="filterProjects('all')">
+                        <div class="stat-icon"><i class="fas fa-project-diagram"></i></div>
+                        <div class="stat-content">
+                            <h3 id="totalProjects">12</h3>
+                            <p>Total Projects</p>
+                            <small class="trend-indicator">+2 this month</small>
+                        </div>
+                    </div>
+                    <div class="stat-card interactive" onclick="filterProjects('active')">
+                        <div class="stat-icon active"><i class="fas fa-play-circle"></i></div>
+                        <div class="stat-content">
+                            <h3 id="activeProjects">8</h3>
+                            <p>Active Projects</p>
+                            <small class="trend-indicator">67% completion rate</small>
+                        </div>
+                    </div>
+                    <div class="stat-card interactive" onclick="filterProjects('completed')">
+                        <div class="stat-icon completed"><i class="fas fa-check-circle"></i></div>
+                        <div class="stat-content">
+                            <h3 id="completedProjects">4</h3>
+                            <p>Completed Projects</p>
+                            <small class="trend-indicator success">+1 this week</small>
+                        </div>
+                    </div>
+                    <div class="stat-card interactive" onclick="showUserDistribution()">
+                        <div class="stat-icon users"><i class="fas fa-users"></i></div>
+                        <div class="stat-content">
+                            <h3 id="totalUsers">15</h3>
+                            <p>Total Users</p>
+                            <small class="trend-indicator">5 Devs, 3 Leads, 1 Admin</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interactive Progress Dashboard -->
+                <div class="progress-dashboard">
+                    <div class="chart-container">
+                        <h3><i class="fas fa-chart-pie"></i> Project Status Distribution</h3>
+                        <div class="chart-legend">
+                            <div class="legend-item" onclick="toggleChartSegment('active')">
+                                <span class="legend-color active"></span>
+                                <span>Active (67%)</span>
+                            </div>
+                            <div class="legend-item" onclick="toggleChartSegment('completed')">
+                                <span class="legend-color completed"></span>
+                                <span>Completed (33%)</span>
+                            </div>
+                        </div>
+                        <canvas id="projectStatusChart"></canvas>
+                        <div class="chart-insights">
+                            <p><i class="fas fa-info-circle"></i> <strong>Insight:</strong> 67% projects are actively in development</p>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <h3><i class="fas fa-chart-bar"></i> User Roles Distribution</h3>
+                        <div class="role-breakdown">
+                            <div class="role-bar" onclick="highlightRole('Developer')">
+                                <div class="role-label">Developers (9)</div>
+                                <div class="role-progress">
+                                    <div class="role-fill developer" style="width: 60%"></div>
+                                </div>
+                                <span class="role-percentage">60%</span>
+                            </div>
+                            <div class="role-bar" onclick="highlightRole('Project Lead')">
+                                <div class="role-label">Project Leads (5)</div>
+                                <div class="role-progress">
+                                    <div class="role-fill lead" style="width: 33%"></div>
+                                </div>
+                                <span class="role-percentage">33%</span>
+                            </div>
+                            <div class="role-bar" onclick="highlightRole('Admin')">
+                                <div class="role-label">Admins (1)</div>
+                                <div class="role-progress">
+                                    <div class="role-fill admin" style="width: 7%"></div>
+                                </div>
+                                <span class="role-percentage">7%</span>
+                            </div>
+                        </div>
+                        <canvas id="userRolesChart" style="display: none;"></canvas>
+                    </div>
+                </div>
+
+                <!-- Live Activity Feed -->
+                <div class="activity-section">
+                    <div class="section">
+                        <h3><i class="fas fa-stream"></i> Live Activity Feed</h3>
+                        <div id="activityFeed" class="activity-feed">
+                            <div class="activity-item recent">
+                                <div class="activity-icon"><i class="fas fa-check-circle"></i></div>
+                                <div class="activity-content">
+                                    <p><strong>dev1</strong> completed "Mobile App UI Design"</p>
+                                    <small>2 minutes ago</small>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon"><i class="fas fa-upload"></i></div>
+                                <div class="activity-content">
+                                    <p><strong>lead1</strong> uploaded document to "E-commerce Platform"</p>
+                                    <small>15 minutes ago</small>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon"><i class="fas fa-user-plus"></i></div>
+                                <div class="activity-content">
+                                    <p><strong>admin1</strong> assigned dev2 to "Data Analytics Dashboard"</p>
+                                    <small>1 hour ago</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="admin-sections">
+                    <div class="section">
+                        <h3><i class="fas fa-folder-open"></i> Project Management</h3>
+                        <button id="addProjectBtn"><i class="fas fa-plus"></i> Add New Project</button>
+                        <div id="projectsList"></div>
+                    </div>
+                    <div class="section">
+                        <h3><i class="fas fa-user-cog"></i> User Management</h3>
+                        <button id="addUserBtn"><i class="fas fa-user-plus"></i> Add New User</button>
+                        <div id="usersList"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Project Lead Dashboard -->
+            <div id="leadDashboard" class="role-dashboard hidden">
+                <h2><i class="fas fa-user-tie"></i> Project Lead Dashboard</h2>
+                
+                <!-- Lead Stats -->
+                <div class="stats-grid lead-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-tasks"></i></div>
+                        <div class="stat-content">
+                            <h3 id="leadTotalProjects">0</h3>
+                            <p>Assigned Projects</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon team"><i class="fas fa-user-friends"></i></div>
+                        <div class="stat-content">
+                            <h3 id="teamMembers">0</h3>
+                            <p>Team Members</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="lead-sections">
+                    <div class="section">
+                        <h3><i class="fas fa-clipboard-list"></i> My Projects</h3>
+                        <div id="leadProjectsList"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Developer Dashboard -->
+            <div id="devDashboard" class="role-dashboard hidden">
+                <h2><i class="fas fa-code"></i> Developer Dashboard</h2>
+                
+                <!-- Developer Stats -->
+                <div class="stats-grid dev-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-clipboard-check"></i></div>
+                        <div class="stat-content">
+                            <h3 id="devAssignedProjects">0</h3>
+                            <p>Assigned Projects</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon docs"><i class="fas fa-file-alt"></i></div>
+                        <div class="stat-content">
+                            <h3 id="totalDocuments">0</h3>
+                            <p>Total Documents</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="dev-sections">
+                    <div class="section">
+                        <h3><i class="fas fa-laptop-code"></i> Assigned Projects</h3>
+                        <div id="devProjectsList"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Project Details Modal -->
+    <div id="projectModal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="projectDetails"></div>
+        </div>
+    </div>
+
+    <!-- Add Project Modal -->
+    <div id="addProjectModal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Add New Project</h3>
+            <form id="addProjectForm">
+                <div class="form-group">
+                    <label for="projectName">Project Name:</label>
+                    <input type="text" id="projectName" required>
+                </div>
+                <div class="form-group">
+                    <label for="projectDescription">Description:</label>
+                    <textarea id="projectDescription" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="projectDeadline">Deadline:</label>
+                    <input type="date" id="projectDeadline" required>
+                </div>
+                <button type="submit">Add Project</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add User Modal -->
+    <div id="addUserModal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Add New User</h3>
+            <form id="addUserForm">
+                <div class="form-group">
+                    <label for="newUsername">Username:</label>
+                    <input type="text" id="newUsername" required>
+                </div>
+                <div class="form-group">
+                    <label for="newPassword">Password:</label>
+                    <input type="password" id="newPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="userRole">Role:</label>
+                    <select id="userRole" required>
+                        <option value="Developer">Developer</option>
+                        <option value="Project Lead">Project Lead</option>
+                        <option value="Admin">Admin</option>
+                    </select>
+                </div>
+                <button type="submit">Add User</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Account Settings Modal -->
+    <div id="accountModal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Account Settings</h3>
+            <form id="changePasswordForm">
+                <div class="form-group">
+                    <label for="currentPassword">Current Password:</label>
+                    <input type="password" id="currentPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="newPasswordInput">New Password:</label>
+                    <input type="password" id="newPasswordInput" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm New Password:</label>
+                    <input type="password" id="confirmPassword" required>
+                </div>
+                <button type="submit">Change Password</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
